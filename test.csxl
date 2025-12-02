@@ -2,7 +2,8 @@
 
 PRINT Hello World
 
-INT number 12345
+INT age 19
+STR name mohammad mehdi sharife
 SHELL ls
 
 PRINT End of program

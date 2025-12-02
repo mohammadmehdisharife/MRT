@@ -1,4 +1,5 @@
 #include "./function.h"
+#include "./memory.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +29,18 @@ void int_function(char *args, int number_line) {
   strtok(args, " ");
   name = strtok(NULL, " ");
   value = atoi(strtok(NULL, " "));
-  printf("args: %s\nname: %s\nvalue: %d\n", args, name, value);
+  add_int(value, name);
+  // print_memory();
+}
+
+void str_function(char *args, int number_line) {
+  char *name;
+  char *value;
+  strtok(NULL, " ");
+  name = strtok(NULL, " ");
+  value = args + strlen(name) + 1;
+  add_str(value, name);
+  // print_memory();
 }
 
 void execute_command(char *function, char *args, int number_line) {
@@ -38,6 +50,8 @@ void execute_command(char *function, char *args, int number_line) {
     shell_function(args, number_line);
   } else if (strcmp(function, "INT") == 0) {
     int_function(args, number_line);
+  } else if (strcmp(function, "STR") == 0) {
+    str_function(args, number_line);
   } else {
     printf("\"%s\" is no a function | line <%d>\n", function, number_line);
     exit(1);
