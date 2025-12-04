@@ -8,6 +8,7 @@ PRINT my name is: $name
 INT age 19
 PRINT my age is: $age
 
-SHELL ls
+STR command ls -la
+SHELL $command
 
 PRINT End of program

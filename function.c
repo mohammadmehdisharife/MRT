@@ -68,11 +68,8 @@ void print_function(char *args, int number_line)
 void shell_function(char *args, int number_line)
 {
     char *space = strchr(args, ' ');
-    if (space != NULL) {
-        system(space + 1);
-    } else {
-        printf("Error: No command at line %d\n", number_line);
-    }
+    char *command = make_string(space++, number_line);
+    system(command);
 }
 
 void int_function(char *args, int number_line)
