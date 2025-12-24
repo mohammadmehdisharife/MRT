@@ -1,5 +1,9 @@
 # Build
 build
+*.7z
+*.rar
+*.zip
+*.tar*
 
 # Prerequisites
 *.d
