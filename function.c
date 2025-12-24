@@ -297,7 +297,7 @@ void str_function(char *args, int number_line)
 
     char *string_value = make_string(clean_value, number_line);
     if (string_value) {
-        add_str(string_value, name);
+        add_str(string_value, name, number_line);
         free(string_value);
     }
 }
@@ -335,7 +335,7 @@ void int_function(char *args, int number_line)
     }
     
     value = make_int(value_copy, number_line);
-    add_int(value, name);
+    add_int(value, name, number_line);
     free(value_copy);
 }
 
