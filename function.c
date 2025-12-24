@@ -11,53 +11,112 @@ char* make_string(char *args, int number_line)
 {
     char *string = NULL;
     char *token;
-    while ((token = strtok(NULL, " ")) != NULL) {
+    
+    static char *saveptr = NULL;
+    char *input;
+    
+    if (args != NULL) {
+        input = strdup(args);
+        if (input == NULL) {
+            print_error("Memory allocation failed", number_line);
+            return NULL;
+        }
+        token = strtok(input, " ");
+    } else {
+        token = strtok(NULL, " ");
+    }
+    
+    if (token == NULL && args != NULL) {
+        free(input);
+        return NULL;
+    }
 
+    while (token != NULL) {
         if (token[0] == '$') {
             int type = exist_variable(token + 1);
 
             if (type == -1) {
                 print_error("variable is not exist.", number_line);
+                if (args != NULL) free(input);
+                free(string);
+                return NULL;
             } else if (type == 0) {
                 int int_value = load_int(token + 1);
                 char value[20];
                 sprintf(value, "%d", int_value);
+                
                 if (string == NULL) {
-                    string = realloc(string, strlen(value) + 1);
-                    strcpy(string, value);
-                    strcat(string, " ");
+                    string = malloc(strlen(value) + 2);
+                    if (string) {
+                        strcpy(string, value);
+                        strcat(string, " ");
+                    }
                 } else {
-                    string = realloc(string, strlen(value) + 1);
-                    strcat(string, value);
-                    strcat(string, " ");
+                    size_t new_len = strlen(string) + strlen(value) + 2;
+                    char *temp = realloc(string, new_len);
+                    if (temp) {
+                        string = temp;
+                        strcat(string, value);
+                        strcat(string, " ");
+                    }
                 }
             } else if (type == 1) {
                 char *value = load_str(token + 1);
+                if (value == NULL) {
+                    print_error("Failed to load string variable", number_line);
+                    if (args != NULL) free(input);
+                    free(string);
+                    return NULL;
+                }
+                
                 if (string == NULL) {
-                    string = realloc(string, strlen(value) + 1);
-                    strcpy(string, value);
-                    strcat(string, " ");
+                    string = malloc(strlen(value) + 2);
+                    if (string) {
+                        strcpy(string, value);
+                        strcat(string, " ");
+                    }
                 } else {
-                    string = realloc(string, strlen(value) + 1);
-                    strcat(string, value);
+                    size_t new_len = strlen(string) + strlen(value) + 2;
+                    char *temp = realloc(string, new_len);
+                    if (temp) {
+                        string = temp;
+                        strcat(string, value);
+                        strcat(string, " ");
+                    }
+                }
+            }
+        } else {
+            if (string == NULL) {
+                string = malloc(strlen(token) + 2);
+                if (string) {
+                    strcpy(string, token);
+                    strcat(string, " ");
+                }
+            } else {
+                size_t new_len = strlen(string) + strlen(token) + 2;
+                char *temp = realloc(string, new_len);
+                if (temp) {
+                    string = temp;
+                    strcat(string, token);
                     strcat(string, " ");
                 }
             }
         }
 
-        else {
-            if (string == NULL) {
-                string = realloc(string, strlen(token) + 1);
-                strcpy(string, token);
-                strcat(string, " ");
-            } else {
-                string = realloc(string, strlen(string) + strlen(token) + 1);
-                strcat(string, token);
-                strcat(string, " ");
-            }
-        }
-
+        token = strtok(NULL, " ");
     }
+    
+    if (args != NULL) {
+        free(input);
+    }
+    
+    if (string && strlen(string) > 0) {
+        size_t len = strlen(string);
+        if (string[len-1] == ' ') {
+            string[len-1] = '\0';
+        }
+    }
+    
     return string;
 }
 
@@ -189,15 +248,58 @@ int make_int(char *args, int number_line)
 
 void print_function(char *args, int number_line)
 {
-    strtok(args, " ");
-    printf("%s\n",make_string(args,number_line));
+    char *print_cmd = strtok(args, " ");
+    if (print_cmd == NULL) return;
+    
+    char *message = make_string(NULL, number_line);
+    if (message) {
+        printf("%s\n", message);
+        free(message);
+    }
 }
 
 void shell_function(char *args, int number_line)
 {
-    char *space = strchr(args, ' ');
-    char *command = make_string(space++, number_line);
-    system(command);
+    char *shell_cmd = strtok(args, " ");
+    if (shell_cmd == NULL) return;
+    
+    char *command = make_string(NULL, number_line);
+    if (command) {
+        system(command);
+        free(command);
+    }
+}
+
+void str_function(char *args, int number_line)
+{
+    char *name;
+    char *value_str;
+
+    char *str_cmd = strtok(args, " ");
+    if (str_cmd == NULL) return;
+    
+    name = strtok(NULL, " ");
+    value_str = strtok(NULL, "");
+    
+    if (name == NULL || value_str == NULL) {
+        print_error("STR: Invalid syntax. Use: STR <name> <value>", number_line);
+        return;
+    }
+
+    char *clean_value = value_str;
+    if (value_str[0] == '"' || value_str[0] == '\'') {
+        clean_value = value_str + 1;
+        int len = strlen(clean_value);
+        if (len > 0 && (clean_value[len-1] == '"' || clean_value[len-1] == '\'')) {
+            clean_value[len-1] = '\0';
+        }
+    }
+
+    char *string_value = make_string(clean_value, number_line);
+    if (string_value) {
+        add_str(string_value, name);
+        free(string_value);
+    }
 }
 
 void int_function(char *args, int number_line)
@@ -206,16 +308,17 @@ void int_function(char *args, int number_line)
     char *value_str;
     int value;
 
-    char *token = strtok(args, " ");
+    char *int_cmd = strtok(args, " ");
+    if (int_cmd == NULL) return;
 
     name = strtok(NULL, " ");
     if (name == NULL) {
-        print_error("Syntax: INT <name> <value>", number_line);
+        print_error("INT: Variable name is required", number_line);
         return;
     }
 
     if (name[0] == '$') {
-        print_error("Variable name cannot start with '$'", number_line);
+        print_error("INT: Variable name cannot start with '$'", number_line);
         return;
     }
 
@@ -226,26 +329,14 @@ void int_function(char *args, int number_line)
     }
 
     char *value_copy = strdup(value_str);
+    if (value_copy == NULL) {
+        print_error("INT: Memory allocation failed", number_line);
+        return;
+    }
+    
     value = make_int(value_copy, number_line);
     add_int(value, name);
     free(value_copy);
-}
-
-void str_function(char *args, int number_line)
-{
-    char *name;
-    char *value;
-
-    strtok(args, " ");
-    name = strtok(NULL, " ");
-    value = strtok(NULL, "");
-
-    if (name == NULL || value == NULL) {
-        printf("Error: Invalid syntax at line %d\n", number_line);
-        return;
-    }
-
-    add_str(value, name);
 }
 
 void execute_command(char *function, char *args, int number_line)
@@ -259,7 +350,7 @@ void execute_command(char *function, char *args, int number_line)
     } else if (strcmp(function, "STR") == 0) {
         str_function(args, number_line);
     } else {
-        printf("\"%s\" is no a function | line <%d>\n", function, number_line);
+        printf("\"%s\" is not a function | line <%d>\n", function, number_line);
         exit(1);
     }
 }
