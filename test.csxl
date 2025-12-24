@@ -1,14 +1,16 @@
 # this is a command
 
-PRINT Hello World
+PRINT [Start Program]
 
 STR name mohammad
-PRINT my name is: $name
+STR name_pointer $name
+PRINT my name is: $name_pointer
 
 INT age 19
-PRINT my age is: $age
+INT age_pointer $age
+PRINT my age is: $age_pointer
 
 STR command ls -la
 SHELL $command
 
-PRINT End of program
+PRINT [End program]
