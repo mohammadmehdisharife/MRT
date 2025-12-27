@@ -11,10 +11,10 @@ char* make_string(char *args, int number_line)
 {
     char *string = NULL;
     char *token;
-    
+
     static char *saveptr = NULL;
     char *input;
-    
+
     if (args != NULL) {
         input = strdup(args);
         if (input == NULL) {
@@ -25,7 +25,7 @@ char* make_string(char *args, int number_line)
     } else {
         token = strtok(NULL, " ");
     }
-    
+
     if (token == NULL && args != NULL) {
         free(input);
         return NULL;
@@ -44,7 +44,7 @@ char* make_string(char *args, int number_line)
                 int int_value = load_int(token + 1);
                 char value[20];
                 sprintf(value, "%d", int_value);
-                
+
                 if (string == NULL) {
                     string = malloc(strlen(value) + 2);
                     if (string) {
@@ -68,7 +68,7 @@ char* make_string(char *args, int number_line)
                     free(string);
                     return NULL;
                 }
-                
+
                 if (string == NULL) {
                     string = malloc(strlen(value) + 2);
                     if (string) {
@@ -105,18 +105,18 @@ char* make_string(char *args, int number_line)
 
         token = strtok(NULL, " ");
     }
-    
+
     if (args != NULL) {
         free(input);
     }
-    
+
     if (string && strlen(string) > 0) {
         size_t len = strlen(string);
         if (string[len-1] == ' ') {
             string[len-1] = '\0';
         }
     }
-    
+
     return string;
 }
 
@@ -250,7 +250,7 @@ void print_function(char *args, int number_line)
 {
     char *print_cmd = strtok(args, " ");
     if (print_cmd == NULL) return;
-    
+
     char *message = make_string(NULL, number_line);
     if (message) {
         printf("%s\n", message);
@@ -262,7 +262,7 @@ void shell_function(char *args, int number_line)
 {
     char *shell_cmd = strtok(args, " ");
     if (shell_cmd == NULL) return;
-    
+
     char *command = make_string(NULL, number_line);
     if (command) {
         system(command);
@@ -277,10 +277,10 @@ void str_function(char *args, int number_line)
 
     char *str_cmd = strtok(args, " ");
     if (str_cmd == NULL) return;
-    
+
     name = strtok(NULL, " ");
     value_str = strtok(NULL, "");
-    
+
     if (name == NULL || value_str == NULL) {
         print_error("STR: Invalid syntax. Use: STR <name> <value>", number_line);
         return;
@@ -333,7 +333,7 @@ void int_function(char *args, int number_line)
         print_error("INT: Memory allocation failed", number_line);
         return;
     }
-    
+
     value = make_int(value_copy, number_line);
     add_int(value, name, number_line);
     free(value_copy);

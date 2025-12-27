@@ -53,7 +53,7 @@ char* load_str(char *name)
 
 void add_int(int value, char *name, int number_line)
 {
-    if (exist_variable(name) != -1) { 
+    if (exist_variable(name) != -1) {
         print_error("variable befor is exist.", number_line);
         exit(1);
     }
