@@ -1,1 +1,1 @@
-rm -rf build *.7z *.rar *.zip *.tar*
+rm -rf build *.zip *.tar*
