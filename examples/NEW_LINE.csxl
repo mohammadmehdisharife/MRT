@@ -1,0 +1,6 @@
+#!../build/csxl
+
+PRINT [Start Program]
+NEW_LINE
+NEW_LINE
+PRINT [End Program]

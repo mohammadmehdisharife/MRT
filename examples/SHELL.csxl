@@ -1,0 +1,8 @@
+#!../build/csxl
+
+PRINT [Start Program]
+
+STR command echo "test shell"
+SHELL $command
+
+PRINT [End Program]

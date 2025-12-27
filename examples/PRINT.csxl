@@ -10,7 +10,4 @@ INT age 19
 INT age_pointer $age
 PRINT my age is: $age_pointer
 
-STR command ls -la
-SHELL $command
-
 PRINT [End program]
