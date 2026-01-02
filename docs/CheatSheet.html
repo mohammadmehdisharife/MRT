@@ -339,6 +339,15 @@
                 ],
                 example: `SHELL echo test shell\nSTR command echo test shell\nSHELL $command`
             },
+            {
+                name: "EXIT",
+                syntax: "EXIT",
+                description: "This function for exit program.",
+                parameters: [
+                    {name: "No", description: "This function has no parameters."},
+                ],
+                example: `EXIT`
+            },
         ];
 
         let activeFunction = null;

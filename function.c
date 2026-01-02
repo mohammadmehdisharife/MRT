@@ -119,6 +119,8 @@ void execute_command(char *function, char *args, int number_line)
         str_function(args, number_line);
     } else if (strcmp(function, "NEW_LINE") == 0) {
         newline_function(number_line);
+    } else if (strcmp(function, "EXIT") == 0) {
+        exit(0);
     } else {
         print_error("Unknown function.",number_line);
         exit(1);
